@@ -214,21 +214,20 @@ function MyNotes() {
     }
   };
 
-
   const filterNotes = (query) => {
-    
     if (query === " " || query === "") {
       setNotes([...allNotes]);
     } else {
-      const filteredNotes = [...allNotes].filter(note => note.title.toLowerCase().includes(query.toLowerCase()));
-      setNotes(filteredNotes); 
+      const filteredNotes = [...allNotes].filter((note) =>
+        note.title.toLowerCase().includes(query.toLowerCase())
+      );
+      setNotes(filteredNotes);
     }
-  }
-  const handleQueryChange = (e) => {
-    setQuery(e.target.value)
-    
   };
-  
+  const handleQueryChange = (e) => {
+    setQuery(e.target.value);
+  };
+
   // const search = async () => {
   //   const allNotesFromSearch = await searchByTitle(query);
   //   setNotes(allNotesFromSearch);
@@ -246,27 +245,30 @@ function MyNotes() {
     console.log(note);
     updateNote(note);
   };
-/*
+  /*
   const handleQueryChange = (e) => {
     setQuery(e.target.value);
     setNotes([...notes].filter((note) => note.title.includes(e.target.value)));
   };
   */
 
-
-
   const sortNotesByCategory = async () => {
-    const allNotesSorted = [...notes].sort((n1, n2) => n1.category.localeCompare(n2.category));
+    const allNotesSorted = [...notes].sort((n1, n2) =>
+      n1.category.localeCompare(n2.category)
+    );
     setNotes(allNotesSorted);
   };
-
+  
   const sortNotesByTitle = async () => {
-    const allNotesSorted = [...notes].sort((n1, n2) => n1.title.localeCompare(n2.title));
+    const allNotesSorted = [...notes].sort((n1, n2) =>n1.title.localeCompare(n2.title, 'en', { numeric: true, sensitivity: 'base' }));
+    //const allNotesSorted = [...notes].sort((n1, n2) => n1.title.toLowerCase().localeCompare(n2.title));
     setNotes(allNotesSorted);
   };
 
   const sortNotesByDate = async () => {
-    const allNotesSorted = [...notes].sort((n1, n2) => n1.date.localeCompare(n2.date));
+    const allNotesSorted = [...notes].sort((n1, n2) =>
+      n1.date.localeCompare(n2.date)
+    );
     setNotes(allNotesSorted);
   };
 
@@ -310,7 +312,11 @@ function MyNotes() {
             className="bx bx-x"
             onClick={() => setAddNoteModalIsOpen(false)}
           ></i>
-          <AddNote setAddNoteModalIsOpen={setAddNoteModalIsOpen} setNotes={setNotes} setAllNotes={setAllNotes}/>
+          <AddNote
+            setAddNoteModalIsOpen={setAddNoteModalIsOpen}
+            setNotes={setNotes}
+            setAllNotes={setAllNotes}
+          />
         </AddNotePopUp>
       </Modal>
       <DivForSearchBarAndSortButtons>
