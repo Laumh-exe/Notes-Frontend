@@ -22,7 +22,6 @@ function Login({ setErrorMessage, errorMessage, setIsLoggedIn, setLoggedInUser, 
         setLoggedInUser(userDetails);
         setUserJustCreated(false);
 
-        //console.log('Login successful:', userDetails);
         navigate("/");
       } else {
         setErrorMessage(data.msg);

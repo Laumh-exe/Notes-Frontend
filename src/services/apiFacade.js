@@ -43,7 +43,6 @@ const login = async (username, password) => {
       localStorage.setItem("token", data.token);
       return data;
     } else {
-      //console.log(data);
       return data;
     }
   } catch (e) {

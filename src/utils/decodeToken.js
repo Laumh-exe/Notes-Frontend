@@ -3,7 +3,6 @@ import { jwtDecode } from "jwt-decode";
 
 export function getUserWithRolesFromToken(token) {
   try {
-
     const decoded = jwtDecode(token);
 
     if (!decoded) {
@@ -17,14 +16,11 @@ export function getUserWithRolesFromToken(token) {
     const rolesArray = Array.isArray(roles) ? roles : roles.split(",");
     const rolesSet = new Set(rolesArray);
 
-    localStorage.setItem('token', token);
+    localStorage.setItem("token", token);
 
-    console.log({ email: email, name: name, roles: Array.from(rolesSet) });
-    
     return { email: email, name: name, roles: Array.from(rolesSet) };
-
   } catch (error) {
     console.error("Error decoding token:", error);
     throw error;
   }
-};
+}
