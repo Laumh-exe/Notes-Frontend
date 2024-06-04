@@ -31,8 +31,6 @@ export default function CreateUser({ setUserJustCreated }) {
       setError("Password and Confirm Password do not match");
       return;
     }
-    console.log({ email: email, password: password });
-
     const userDetailsEntered = { email: email, password: password };
 
     try {
@@ -45,6 +43,7 @@ export default function CreateUser({ setUserJustCreated }) {
         navigate("/login");
       }
     } catch (error) {
+      setError("An error occurred. Please try again.");
       console.error("Error in handleCreateUser:", error);
     }
   };
@@ -53,9 +52,8 @@ export default function CreateUser({ setUserJustCreated }) {
     <>
       <LoginWrapper>
         <LoginPage>
-
           <Styledwrapper>
-          <h1>Sign Up</h1>
+            <h1>Sign Up</h1>
             <form onSubmit={handleSubmit}>
               <StyledInputBox>
                 <input
@@ -99,7 +97,7 @@ export default function CreateUser({ setUserJustCreated }) {
             <StyledRegisterLink>
               <p>
                 Already have an account?
-                <a href={"/Login"}> Log in</a>  
+                <a href={"/Login"}> Log in</a>
               </p>
             </StyledRegisterLink>
           </Styledwrapper>
