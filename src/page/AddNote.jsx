@@ -28,15 +28,17 @@ function AddNote({ setAddNoteModalIsOpen, setNotes , setAllNotes}) {
     const note = { title, content, category };
 
     try {
-      const addedNote = await createNote(note);
+      await createNote(note, (addedNote) => {
+        setNotes((prevNotes) => {
+          return [...prevNotes, addedNote];
+        });
+        setAllNotes((prevNotes) => {
+          return [...prevNotes, addedNote];
+        });
+      });
 
       setMessage("Note successfully saved");
-      setNotes((prevNotes) => {
-        return [...prevNotes, addedNote];
-      });
-      setAllNotes((prevNotes) => {
-        return [...prevNotes, addedNote];
-      });
+
       setTitle("");
       setContent("");
       setCategory("");

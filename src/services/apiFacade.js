@@ -1,30 +1,32 @@
 import { BASE_URL } from "../utils/globalVariables";
 
-async function createUser(userDetailsEntered) {
-  try {
-    const response = await fetch(`${BASE_URL}/auth/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userDetailsEntered),
+
+function createUser(userDetailsEntered) {
+  // Initiate the fetch request
+
+  return fetch(`${BASE_URL}/auth/register`, {
+    method: "POST", 
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userDetailsEntered), 
+  })
+    
+    .then((result) => {
+     
+      return result.json(); 
+    })
+    .catch((error) => {
+      
+      console.error("Error creating entity:", error); 
+      throw error; 
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error creating entity:", error);
-    throw error;
-  }
 }
+
 
 const login = async (username, password) => {
   try {
-    const response = await fetch(`${BASE_URL}/auth/login`, {
+    const result = await fetch(`${BASE_URL}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -34,15 +36,14 @@ const login = async (username, password) => {
         password: password,
       }),
     });
-    if(!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const data = await response.json();
+
+    const data = await result.json();
 
     if (data.token) {
       localStorage.setItem("token", data.token);
       return data;
     } else {
+      console.log(data);
       return data;
     }
   } catch (e) {

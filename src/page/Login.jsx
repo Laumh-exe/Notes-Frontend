@@ -28,6 +28,7 @@ function Login({ setErrorMessage, errorMessage, setIsLoggedIn, setLoggedInUser, 
       }
     } catch (err) {
       console.log("Some error happened when logging in. The error: " + err);
+      setErrorMessage(data.msg);
     }
   };
 

@@ -4,7 +4,7 @@ import {
   readAllNotes,
   deleteNote,
   updateNote,
-  getUserEmails
+  getUserEmails,
 } from "../services/noteService";
 import Modal from "react-modal";
 import AddNote from "../page/AddNote";
@@ -49,12 +49,6 @@ function MyNotes() {
     setQuery(e.target.value);
   };
 
-  // const search = async () => {
-  //   const allNotesFromSearch = await searchByTitle(query);
-  //   setNotes(allNotesFromSearch);
-
-  // }
-
   const handleDelete = async (note) => {
     await deleteNote(note);
     setNotes(notes.filter((n) => n.id !== note.id));
@@ -65,12 +59,6 @@ function MyNotes() {
     const note = { ...thisNote, content, title, category };
     updateNote(note);
   };
-  /*
-  const handleQueryChange = (e) => {
-    setQuery(e.target.value);
-    setNotes([...notes].filter((note) => note.title.includes(e.target.value)));
-  };
-  */
 
   const sortNotesByCategory = async () => {
     const allNotesSorted = [...notes].sort((n1, n2) =>
@@ -78,10 +66,14 @@ function MyNotes() {
     );
     setNotes(allNotesSorted);
   };
-  
+
   const sortNotesByTitle = async () => {
-    const allNotesSorted = [...notes].sort((n1, n2) =>n1.title.localeCompare(n2.title, 'en', { numeric: true, sensitivity: 'base' }));
-    //const allNotesSorted = [...notes].sort((n1, n2) => n1.title.toLowerCase().localeCompare(n2.title));
+    const allNotesSorted = [...notes].sort((n1, n2) =>
+      n1.title.localeCompare(n2.title, "en", {
+        numeric: true,
+        sensitivity: "base",
+      })
+    );
     setNotes(allNotesSorted);
   };
 
@@ -93,9 +85,10 @@ function MyNotes() {
   };
 
   const fetchAllNotes = async () => {
-    const allNotes = await readAllNotes();
-    setAllNotes(allNotes); 
-    setNotes(allNotes);
+    await readAllNotes((fetchedNotes) => {
+      setAllNotes(fetchedNotes);
+      setNotes(fetchedNotes);
+    });
   };
 
   useEffect(() => {
@@ -139,7 +132,7 @@ function MyNotes() {
         </AddNotePopUp>
       </Modal>
       <DivForSearchBarAndSortButtons>
-        <SearchWrapper> 
+        <SearchWrapper>
           <SearchBar
             type="text"
             placeholder="Search..."
@@ -156,8 +149,8 @@ function MyNotes() {
         </SearchWrapper>
         <SortSelectWrapper>
           <SortSelect onChange={handleSortChange}>
-            <option value= "" disabled>
-              sort by...  
+            <option value="" disabled>
+              sort by...
             </option>
             <option>Category</option>
             <option>Title</option>
@@ -174,7 +167,7 @@ function MyNotes() {
               handleUpdateNote={handleUpdateNote}
             />
           </div>
-        ))} 
+        ))}
       </MyNotesBody>
     </PageContainer>
   );
@@ -182,15 +175,205 @@ function MyNotes() {
 
 export default MyNotes;
 
-//-------------------- STYLES --------------------//
+
+//----------NOTECOMPONENT---------//
+
+const Note = ({ note, handleDelete, handleUpdateNote }) => {
+  const [noteContent, setNoteContent] = useState(note.content);
+  const [noteTitle, setNoteTitle] = useState(note.title);
+  const [collaboratorToAdd, setCollaboratorToAdd] = useState("");
+  const [category, setCategory] = useState(note.category);
+  const [isEditing, setIsEditing] = useState(false);
+  const [contentChanged, setContentChanged] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  const handleCategoryChange = () => {
+    setContentChanged(true);
+    setCategory((prevCategory) =>
+      prevCategory === "NOTE" ? "REMINDER" : "NOTE"
+    );
+  };
+
+  const toggleEditing = () => {
+    setIsEditing(!isEditing);
+  };
+
+  const handleInputChange = (event) => {
+    setContentChanged(true);
+    if (event.target.id === "title") {
+      setNoteTitle(event.target.value);
+    } else {
+      setNoteContent(event.target.value);
+    }
+  };
+
+  const handleChange = (e) => {
+    setCollaboratorToAdd(e.target.value);
+  };
+
+  const addCollaboratorSubmit = async (e) => {
+    e.preventDefault();
+
+    let newCollaborator;
+
+    await new Promise((resolve) => {
+      getUserEmails((userEmails) => {
+        newCollaborator = userEmails.find(
+          (ue) => ue.email === collaboratorToAdd
+        );
+        resolve();
+      });
+    });
+
+    if (newCollaborator) {
+      note.colaborators = [...note.colaborators, newCollaborator.email];
+      handleUpdateNote(
+        note,
+        noteContent,
+        noteTitle,
+        category,
+        note.colaborators
+      );
+      setCollaboratorToAdd("");
+    } else {
+      // TODO unhappy path
+    }
+  };
+
+  return (
+    <>
+      <NoteContainer>
+        <NoteWrapper>
+          <i className="bx bx-x" onClick={() => handleDelete(note)}></i>
+          {contentChanged ? (
+            <i
+              className="bx bx-check"
+              onClick={() => {
+                handleUpdateNote(note, noteContent, noteTitle, category);
+                setContentChanged(false);
+              }}
+            ></i>
+          ) : (
+            <i className="bx bx-radio-circle"></i>
+          )}
+          <CategoryDiv $category={category} onClick={handleCategoryChange}>
+            <p>{category}</p>
+          </CategoryDiv>
+          <StyledDate>{note.date}</StyledDate>
+          <ContentWrapper>
+            {isEditing ? (
+              <StyledTitleEdit
+                id="title"
+                onBlur={toggleEditing}
+                value={noteTitle}
+                onChange={handleInputChange}
+              />
+            ) : (
+              <StyledTitleDisplay onClick={toggleEditing}>
+                {noteTitle}
+              </StyledTitleDisplay>
+            )}
+            <hr></hr>
+            <StyledTextArea
+              id="content"
+              value={noteContent}
+              onChange={handleInputChange}
+            />
+          </ContentWrapper>
+          <div>
+            <ColabIcon>
+              <i
+                className="bx bxs-user-plus"
+                onClick={() => setModalIsOpen(true)}
+              ></i>
+            </ColabIcon>
+            <Modal
+              className="modal"
+              isOpen={modalIsOpen}
+              onRequestClose={() => setModalIsOpen(false)}
+              style={{
+                overlay: {
+                  backgroundColor: "rgba(0, 0, 0, 0.617)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                },
+              }}
+            >
+              <StyledPopup>
+                <i
+                  className="bx bx-x"
+                  onClick={() => setModalIsOpen(false)}
+                ></i>
+                <PopupTitle>Add Collaborator</PopupTitle>
+                <form
+                  onSubmit={addCollaboratorSubmit}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <input
+                    style={{
+                      padding: "5px",
+                      width: "50%",
+                      height: "30px",
+                      borderRadius: "5px",
+                      margin: "10px",
+                      border: "none",
+                    }}
+                    type="text"
+                    onChange={handleChange}
+                  />
+                  <button
+                    type="submit"
+                    style={{
+                      padding: "10px",
+                      width: "50%",
+                      height: "40px",
+                      borderRadius: "5px",
+                      border: "none",
+                    }}
+                  >
+                    add collaborator
+                  </button>
+                </form>
+                {!isEditing ? (
+                  <>
+                    <h3>Collaborators</h3>
+                    <hr></hr>
+                    <div
+                      style={{
+                        maxHeight: "84px", // Adjust as needed
+                        overflowY: "auto",
+                      }}
+                    >
+                      {note.colaborators.map((c) => (
+                        <a key={c}>
+                          {c}
+                          <br></br>
+                        </a>
+                      ))}
+                    </div>
+                  </>
+                ) : null}
+              </StyledPopup>
+            </Modal>
+          </div>
+        </NoteWrapper>
+      </NoteContainer>
+    </>
+  );
+};
+//-------------------- PAGE STYLES --------------------//
 // PAGE CONTENT
 const PageContainer = styled.div`
   * {
     margin: 0;
     box-sizing: border-box;
   }
-  width: 100%; 
-
+  width: 100%;
 `;
 
 const DivForSearchBarAndSortButtons = styled.div`
@@ -296,8 +479,8 @@ const MyNotesBody = styled.div`
   width: 90%;
   margin: 40px auto auto auto;
 
-  justify-items: ${(props) => (props.$oneNote ? "center;" : "")};
   max-width: ${(props) => (props.$oneNote ? "30%;" : "")};
+
   @media (max-width: 970px) {
     max-width: ${(props) => (props.$oneNote ? "70%;" : "")};
   }
@@ -332,190 +515,7 @@ const AddNotePopUp = styled.div`
   }
 `;
 
-//----------NOTECOMPONENT---------//
-
-const Note = ({ note, handleDelete, handleUpdateNote }) => {
-  const [noteContent, setNoteContent] = useState(note.content);
-  const [noteTitle, setNoteTitle] = useState(note.title);
-  const [collaboratorToAdd, setCollaboratorToAdd] = useState("");
-  const [category, setCategory] = useState(note.category);
-  const [isEditing, setIsEditing] = useState(false);
-  const [contentChanged, setContentChanged] = useState(false);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-
-  const handleCategoryChange = () => {
-    setContentChanged(true);
-    setCategory((prevCategory) =>
-      prevCategory === "NOTE" ? "REMINDER" : "NOTE"
-    );
-  };
-
-  const toggleEditing = () => {
-    setIsEditing(!isEditing);
-  };
-
-  const handleInputChange = (event) => {
-    setContentChanged(true);
-    if (event.target.id === "title") {
-      setNoteTitle(event.target.value);
-    } else {
-      setNoteContent(event.target.value);
-    }
-  };
-
-  const handleChange = (e) => {
-    setCollaboratorToAdd(e.target.value);
-  };
-
-  const addColaboratroSubmit = async (e) => {
-    e.preventDefault();
-    const userEmails = await getUserEmails();
-    const newColaborator = userEmails.find(
-      (ue) => ue.email === collaboratorToAdd
-    );
-    if (newColaborator) {
-      note.colaborators = [...note.colaborators, newColaborator.email];
-      handleUpdateNote(
-        note,
-        noteContent,
-        noteTitle,
-        category,
-        note.colaborators
-      );
-      setCollaboratorToAdd("");
-    } else {
-      // TODO unhappy path
-    }
-  };
-
-  return (
-    <>
-      <NoteContainer>
-        <NoteWrapper>
-          <i className="bx bx-x" onClick={() => handleDelete(note)}></i>
-          {contentChanged ? (
-            <i
-              className="bx bx-check"
-              onClick={() => {
-                handleUpdateNote(note, noteContent, noteTitle, category);
-                setContentChanged(false);
-              }}
-            ></i>
-          ) : (
-            <i className="bx bx-radio-circle"></i>
-          )}
-          <CategoryDiv $category={category} onClick={handleCategoryChange}>
-            <p>{category}</p>
-          </CategoryDiv>
-          <StyledDate>{note.date}</StyledDate>
-          <ContentWrapper>
-            {isEditing ? (
-              <StyledTitleEdit
-                id="title"
-                onBlur={toggleEditing}
-                value={noteTitle}
-                onChange={handleInputChange}
-              />
-            ) : (
-              <StyledTitleDisplay onClick={toggleEditing}>
-                {noteTitle}
-              </StyledTitleDisplay>
-            )}
-            <hr></hr>
-            <StyledTextArea
-              id="content"
-              value={noteContent}
-              onChange={handleInputChange}
-            />
-          </ContentWrapper>
-          <div>
-            <ColabIcon>
-              <i
-                className="bx bxs-user-plus"
-                onClick={() => setModalIsOpen(true)}
-              ></i>
-            </ColabIcon>
-            <Modal
-              className="modal"
-              isOpen={modalIsOpen}
-              onRequestClose={() => setModalIsOpen(false)}
-              style={{
-                overlay: {
-                  backgroundColor: "rgba(0, 0, 0, 0.617)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                },
-              }}
-            >
-              <StyledPopup>
-                <i
-                  className="bx bx-x"
-                  onClick={() => setModalIsOpen(false)}
-                ></i>
-                <PopupTitle>Add Collaborator</PopupTitle>
-                <form
-                  onSubmit={addColaboratroSubmit}
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <input
-                    style={{
-                      padding: "5px",
-                      width: "50%",
-                      height: "30px",
-                      borderRadius: "5px",
-                      margin: "10px",
-                      border: "none",
-                    }}
-                    type="text"
-                    onChange={handleChange}
-                  />
-                  <button
-                    type="submit"
-                    style={{
-                      padding: "10px",
-                      width: "50%",
-                      height: "40px",
-                      borderRadius: "5px",
-                      border: "none",
-                    }}
-                  >
-                    add collaborator
-                  </button>
-                </form>
-                {!isEditing ? (
-                  <>
-                    <h3>Collaborators</h3>
-                    <hr></hr>
-                    <div
-                      style={{
-                        maxHeight: "84px", // Adjust as needed
-                        overflowY: "auto",
-                      }}
-                    >
-                      {note.colaborators.map((c) => (
-                        <a key={c}>
-                          {c}
-                          <br></br>
-                        </a>
-                      ))}
-                    </div>
-                  </>
-                ) : null}
-              </StyledPopup>
-            </Modal>
-          </div>
-        </NoteWrapper>
-      </NoteContainer>
-    </>
-  );
-};
-
-//-------------------- STYLES --------------------//
+//-------------------- NOTE STYLES--------------------//
 //category
 const CategoryDiv = styled.div`
   position: absolute;
@@ -553,7 +553,6 @@ const StyledDate = styled.div`
 `;
 
 const StyledTitleDisplay = styled.div`
-
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -570,11 +569,10 @@ const StyledTitleDisplay = styled.div`
   outline: none;
   @media (max-width: 1412px) {
     width: 50%;
-  } 
+  }
   @media (max-width: 1242px) {
     width: 46%;
   }
-  
 `;
 
 //title
@@ -594,12 +592,12 @@ const StyledTitleEdit = styled.textarea`
   font-family: "Letter Gothic Std", monospace;
   vertical-align: top;
   outline: none;
-  @media (max-width: 1412px) { 
+  @media (max-width: 1412px) {
     width: 50%;
   }
   @media (max-width: 1242px) {
     width: 46%;
-  } 
+  }
 `;
 
 //note
@@ -728,3 +726,4 @@ const PopupTitle = styled.h2`
   text-align: center;
   font-weight: 500;
 `;
+

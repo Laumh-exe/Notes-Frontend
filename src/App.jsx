@@ -24,7 +24,6 @@ function App() {
     roles: ["user"],
   });
 
-  const navigate = useNavigate();
 
   const checkTokenExpiry = (exp) => {
     return Date.now() >= exp * 1000;
@@ -71,6 +70,8 @@ function App() {
   return (
     <Routes>
       <Route
+
+      //No path === element is always rendered and is the default route(blocks access to all other routes if not logged in)
         element={
           <ProtectedRoutes isLoggedIn={isLoggedIn} location={location} isLoading={isLoading}>
             <AppLayout

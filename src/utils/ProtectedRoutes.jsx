@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
+//Children has to contain outlet and navbar. 
 export function ProtectedRoutes({ children, isLoggedIn, isLoading }) {
   const navigate = useNavigate();
 
