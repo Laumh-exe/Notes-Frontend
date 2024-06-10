@@ -10,8 +10,10 @@ import AppLayout from "./layout/AppLayout.jsx";
 import CreateUser from "./page/CreateUser.jsx";
 import ProtectedRoutes from "./utils/ProtectedRoutes.jsx";
 import UserOverview from "./page/admin/UserOverview.jsx";
-
+import User from "./page/User.jsx";
 import MyNotes from "./page/MyNotes.jsx";
+import Profile from "./page/Profile.jsx";
+import Account from "./page/Account.jsx";
 
 function App() {
   const [userJustCreated, setUserJustCreated] = useState(false);
@@ -24,6 +26,9 @@ function App() {
     roles: ["user"],
   });
 
+  // useEffect(() => {
+  //   throw new Error("This is a test error");
+  // }, []);
 
   const checkTokenExpiry = (exp) => {
     return Date.now() >= exp * 1000;
@@ -32,15 +37,16 @@ function App() {
   useEffect(() => {
     // Check the token right away
     checkToken();
-
     // Then check the token every 15 minutes
     const intervalId = setInterval(checkToken, 15 * 60 * 1000);
 
     // Clear the interval when the component is unmounted
-    return () => clearInterval(intervalId);
+    return () => {clearInterval(intervalId)
+    };
   }, []);
 
   const checkToken = () => {
+    setIsLoading(true);
     const token = localStorage.getItem("token");
     if (token) {
       try {
@@ -68,43 +74,50 @@ function App() {
   };
 
   return (
-    <Routes>
-      <Route
-
-      //No path === element is always rendered and is the default route(blocks access to all other routes if not logged in)
-        element={
-          <ProtectedRoutes isLoggedIn={isLoggedIn} location={location} isLoading={isLoading}>
-            <AppLayout
+      <Routes>
+        <Route
+          //No path === element is always rendered and is the default route(blocks access to all other routes if not logged in)
+          element={
+            <ProtectedRoutes
+              isLoggedIn={isLoggedIn}
+              location={location}
+              isLoading={isLoading}
+            >
+              <AppLayout
+                setIsLoggedIn={setIsLoggedIn}
+                loggedInUser={loggedInUser}
+                setLoggedInUser={setLoggedInUser}
+              />
+            </ProtectedRoutes>
+          }
+        >
+          <Route path="/" element={<MyNotes />} />
+          <Route path="/adminPage" element={<UserOverview />} />
+          <Route path="/user" element={<User />}> 
+            <Route path="profile" element={<Profile />} />
+            <Route path="account" element={<Account />} />
+          </Route>
+          <Route path="/about" element={<About />} />
+          <Route path="/*" element={<PageNotFound />} />
+        </Route>
+        <Route
+          path="/login"
+          element={
+            <Login
+              setErrorMessage={setErrorMessage}
+              errorMessage={errorMessage}
               setIsLoggedIn={setIsLoggedIn}
-              loggedInUser={loggedInUser}
               setLoggedInUser={setLoggedInUser}
+              userJustCreated={userJustCreated}
+              setUserJustCreated={setUserJustCreated}
             />
-          </ProtectedRoutes>
-        }
-      >
-        <Route path="/" element={<MyNotes />} />
-        <Route path="/adminPage" element={<UserOverview />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/*" element={<PageNotFound />} />
-      </Route>
-      <Route
-        path="/login"
-        element={
-          <Login
-            setErrorMessage={setErrorMessage}
-            errorMessage={errorMessage}
-            setIsLoggedIn={setIsLoggedIn}
-            setLoggedInUser={setLoggedInUser}
-            userJustCreated={userJustCreated}
-            setUserJustCreated={setUserJustCreated}
-          />
-        }
-      />
-      <Route
-        path="/createUser"
-        element={<CreateUser setUserJustCreated={setUserJustCreated} />}
-      />
-    </Routes>
+          }
+        />
+        <Route
+          path="/createUser"
+          element={<CreateUser setUserJustCreated={setUserJustCreated} />}
+        />
+      </Routes>
   );
 }
 

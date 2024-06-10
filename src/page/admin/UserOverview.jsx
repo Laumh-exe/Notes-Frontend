@@ -97,9 +97,7 @@ export default function UserOverview() {
           setConfirmPassword={setConfirmPassword}
           confirmPassword={confirmPassword}
           error={error}
-          setError={setError}
           confirmPasswordchange={confirmPassword}
-          setSuccess={setSuccess}
           success={success}
           role={role}
           setRole={setRole}

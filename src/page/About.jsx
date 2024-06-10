@@ -30,9 +30,14 @@ export default function About() {
 
 const StyledDiv = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: column; //Change to row for example
+  flex-wrap: wrap;
+  justify-content: space-between;
+  
   padding: 30px 40px;
-  max-width: 500px;
+  min-height: 400px;
+  max-width: 500px; // remove for example 
+  min-width: 360px;
   margin: auto;
   margin-top: 10px;
   backdrop-filter: blur(100px);
@@ -43,21 +48,29 @@ const StyledDiv = styled.div`
 `;
 
 const StyledH1 = styled.h1`
+max-width: 500px;
   color: #333;
   text-align: center;
-  margin-bottom: 20px;
   font-weight: 500;
+    //Example border
+  border: 2px solid;
+
 `;
 
 const StyledIntro = styled.p`
+max-width: 500px;
   color: #666;
   font-size: 18px;
   line-height: 1.6;
   text-align: center;
+  //Example border
+  border: 2px solid;
 `;
 
 const StyledUses = styled.div`
-  margin-top: 30px;
+max-width: 500px;
+    //Example border
+  border: 2px solid;
 `;
 
 const StyledTitle = styled.h2`

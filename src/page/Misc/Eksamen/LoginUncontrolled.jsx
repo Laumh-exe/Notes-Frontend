@@ -1,4 +1,4 @@
-import React, { useState , useEffect} from "react";
+import React, { useEffect, createRef } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { getUserWithRolesFromToken } from "../utils/decodeToken.js";
@@ -6,23 +6,25 @@ import { login } from "../services/apiFacade.js";
 import backgroundImage from '/src/img/and-machines-vqTWfa4DjEk-unsplash.jpg'; //CHANGE BACKGROUND IMAGE
 
 function Login({ setErrorMessage, errorMessage, setIsLoggedIn, setLoggedInUser, userJustCreated, setUserJustCreated}) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const usernameRef = createRef();
+  const passwordRef = createRef();
 
-  // useEffect(() => {
-  //   // This code runs after the component mounts
-  //   console.log('Component mounted');
+  useEffect(() => {
+    // This code runs after the component mounts
+    console.log('Component mounted');
   
-  //   return () => {
-  //     // This code runs before the component unmounts
-  //     console.log('Component will unmount');
-  //   };
-  // }, []); //
+    return () => {
+      // This code runs before the component unmounts
+      console.log('Component will unmount');
+    };
+  }, []); //
 
   const navigate = useNavigate();
 
   const handleLogin = async (event) => {
     event.preventDefault();
+    const username = usernameRef.current.value;
+    const password = passwordRef.current.value;
     try {
       const data = await login(username, password);
 
@@ -54,8 +56,7 @@ function Login({ setErrorMessage, errorMessage, setIsLoggedIn, setLoggedInUser, 
                 <input
                   type="text" 
                   placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  ref={usernameRef}
                 />
                 <i className="bx bxs-user"></i>
               </StyledInputBox>
@@ -63,12 +64,11 @@ function Login({ setErrorMessage, errorMessage, setIsLoggedIn, setLoggedInUser, 
                 <input
                   type="password"
                   placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  ref={passwordRef}
                 />
                 <i className="bx bxs-lock-alt"></i>
               </StyledInputBox>
-              <StyledButton type="submit">Login</StyledButton>
+              <StyledButton>Login</StyledButton>
             </form>
 
             <StyledRegisterLink>

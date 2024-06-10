@@ -36,15 +36,12 @@ function MyNotes() {
   };
 
   const filterNotes = (query) => {
-    if (query === " " || query === "") {
-      setNotes([...allNotes]);
-    } else {
-      const filteredNotes = [...allNotes].filter((note) =>
-        note.title.toLowerCase().includes(query.toLowerCase())
-      );
-      setNotes(filteredNotes);
-    }
+    const filteredNotes = allNotes.filter((note) =>
+      note.title.toLowerCase().includes(query.toLowerCase())
+    );
+    setNotes(filteredNotes);
   };
+  
   const handleQueryChange = (e) => {
     setQuery(e.target.value);
   };
@@ -78,6 +75,7 @@ function MyNotes() {
   };
 
   const sortNotesByDate = async () => {
+    //Create new array by using spread operator [...array]
     const allNotesSorted = [...notes].sort((n1, n2) =>
       n1.date.localeCompare(n2.date)
     );
@@ -175,7 +173,6 @@ function MyNotes() {
 
 export default MyNotes;
 
-
 //----------NOTECOMPONENT---------//
 
 const Note = ({ note, handleDelete, handleUpdateNote }) => {
@@ -235,9 +232,7 @@ const Note = ({ note, handleDelete, handleUpdateNote }) => {
         note.colaborators
       );
       setCollaboratorToAdd("");
-    } else {
-      // TODO unhappy path
-    }
+    } 
   };
 
   return (
@@ -473,7 +468,10 @@ const SearchWrapper = styled.div`
 const MyNotesBody = styled.div`
   margin: 12px 20px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(300px, 1fr)
+  ); //autofit: generate withut overflow, minmax: min and max width
   grid-gap: 50px;
   justify-content: space-between;
   width: 90%;
@@ -485,7 +483,7 @@ const MyNotesBody = styled.div`
     max-width: ${(props) => (props.$oneNote ? "70%;" : "")};
   }
   @media (max-width: 570px) {
-    max-width: ${(props) => (props.$oneNote ? "100vh" : "")};
+    max-width: ${(props) => (props.$oneNote ? "100vw" : "")};
   }
 `;
 
@@ -726,4 +724,3 @@ const PopupTitle = styled.h2`
   text-align: center;
   font-weight: 500;
 `;
-

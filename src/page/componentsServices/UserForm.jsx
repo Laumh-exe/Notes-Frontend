@@ -1,29 +1,38 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 
-export default function UserForm({ updateUser, userToEdit, setUserToEdit, error , confirmPassword, setConfirmPassword, setError, success, setSuccess, role, setRole, password, setPassword, userRolesBeforeEdit}) {
-  
-
+export default function UserForm({
+  updateUser,
+  userToEdit,
+  setUserToEdit,
+  error,
+  confirmPassword,
+  setConfirmPassword,
+  success,
+  role,
+  setRole,
+  password,
+  setPassword,
+  userRolesBeforeEdit,
+}) {
   const [showPassword, setShowPassword] = useState(false);
-  
 
-const handlePasswordChange = (e) =>{
-  setPassword(e.target.value);
-  setUserToEdit((prevUser) => ({...prevUser, password: e.target.value}))
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    setUserToEdit((prevUser) => ({ ...prevUser, password: e.target.value }));
+  };
 
-}
+  const handleConfirmPasswordChange = (e) => {
+    setConfirmPassword(e.target.value);
+  };
 
-const handleConfirmPasswordChange = (e) =>{
-  setConfirmPassword(e.target.value);
- 
-}
-
-const handleRolesChange = (e) =>{
-  setRole(e.target.value)
-  setUserToEdit((prevUser) => ({...prevUser, roles: [...userRolesBeforeEdit, e.target.value]}));
-  
-}
-
+  const handleRolesChange = (e) => {
+    setRole(e.target.value);
+    setUserToEdit((prevUser) => ({
+      ...prevUser,
+      roles: [...userRolesBeforeEdit, e.target.value],
+    }));
+  };
 
   return (
     <>
@@ -32,7 +41,10 @@ const handleRolesChange = (e) =>{
         <label htmlFor="password">New Password</label>
         <br></br>
         <label>
-        <input type="checkbox" onClick={() => setShowPassword(!showPassword)}/>
+          <input
+            type="checkbox"
+            onClick={() => setShowPassword(!showPassword)}
+          />
           Show password
         </label>
         <br></br>
@@ -55,7 +67,12 @@ const handleRolesChange = (e) =>{
         <br></br>
         <label htmlFor="roles">Role </label>
         <br></br>
-        <select id="roles" onChange={handleRolesChange} value={role} disabled={!userToEdit.email}>
+        <select
+          id="roles"
+          onChange={handleRolesChange}
+          value={role}
+          disabled={!userToEdit.email}
+        >
           <option value="">Add role</option>
           <option value="user">user</option>
           <option value="admin">admin</option>
@@ -113,7 +130,6 @@ const Styledwrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  
 
   margin: 0;
   box-sizing: border-box;
